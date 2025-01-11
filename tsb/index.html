@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全色调调色板工具</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>全色调调色板工具</h1>
+
+        <!-- RGB 选择器 -->
+        <div class="color-picker">
+            <h2>RGB 选择器</h2>
+            <label for="r">R: </label>
+            <input type="range" id="r" min="0" max="255" value="255">
+            <span id="r-value">255</span>
+            <br>
+            <label for="g">G: </label>
+            <input type="range" id="g" min="0" max="255" value="99">
+            <span id="g-value">99</span>
+            <br>
+            <label for="b">B: </label>
+            <input type="range" id="b" min="0" max="255" value="71">
+            <span id="b-value">71</span>
+        </div>
+
+        <!-- HSL 选择器 -->
+        <div class="color-picker">
+            <h2>HSL 选择器</h2>
+            <label for="h">H: </label>
+            <input type="range" id="h" min="0" max="360" value="0">
+            <span id="h-value">0</span>
+            <br>
+            <label for="s">S: </label>
+            <input type="range" id="s" min="0" max="100" value="100">
+            <span id="s-value">100</span>
+            <br>
+            <label for="l">L: </label>
+            <input type="range" id="l" min="0" max="100" value="50">
+            <span id="l-value">50</span>
+        </div>
+
+        <!-- 颜色调色板 -->
+        <div class="palette">
+            <!-- 颜色方块 -->
+            <div class="color-box" style="background-color: rgb(255, 99, 71);" data-color="rgb(255, 99, 71)"></div>
+        </div>
+
+        <div class="color-info">
+            <p>选择的颜色: <span id="color-display">rgb(255, 99, 71)</span></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
