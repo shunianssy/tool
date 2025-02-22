@@ -1,7 +1,7 @@
 class hello {
     getInfo() {
         return {
-            id: "thefox-wbe-interactive-114514",
+            id: "thefoxwbeinteractive114514",
             name: "小狐狸的网站交互",
             color1: "#ba2be2",
             blocks: [
@@ -95,7 +95,7 @@ class hello {
                     arguments: {
                         url: {
                             type: Scratch.ArgumentType.STRING,
-                            defaultValue: "https://www.example.com"
+                            defaultValue: "https://shunian.scerpark.cn/"
                         }
                     }
                 },
