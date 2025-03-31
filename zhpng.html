@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG to PNG</title>
+</head>
+<body>
+    <h1>svg格式转换为png格式</h1>
+    
+    <input type="file" id="upload" accept=".svg"/>
+    <br><br>
+    
+    <!-- 清晰度调整滑动条 -->
+    <label for="scaleControl">调整清晰度: </label>
+    <input type="range" id="scaleControl" min="1" max="5" step="0.1" value="5">
+    <span id="scaleValue">5</span>
+    
+    <br><br>
+    
+    <button id="downloadBtn" disabled>下载转换png文件</button>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <a href="https://m.bilibili.com/space/3493133419546943">关注作者的bilibili</a>
+    <script>
+        // 获取文件上传和按钮
+        const uploadInput = document.getElementById('upload');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const scaleControl = document.getElementById('scaleControl');
+        const scaleValue = document.getElementById('scaleValue');
+
+        // 设置清晰度最大值为5
+        scaleControl.value = 5;
+        scaleValue.textContent = scaleControl.value;
+
+        // 更新显示的清晰度值
+        scaleControl.addEventListener('input', function() {
+            scaleValue.textContent = scaleControl.value;
+        });
+
+        // 处理文件上传
+        uploadInput.addEventListener('change', handleFileUpload);
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const svgContent = e.target.result;
+                    convertSVGToPNG(svgContent);
+                };
+                reader.readAsText(file);
+            } else {
+                alert('Please upload a valid SVG file.');
+            }
+        }
+
+        // 转换SVG到PNG
+        function convertSVGToPNG(svgContent) {
+            const img = new Image();
+            const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+            const svgUrl = URL.createObjectURL(svgBlob);
+            
+            img.onload = function() {
+                // 获取SVG的原始宽高
+                const originalWidth = img.width;
+                const originalHeight = img.height;
+
+                // 设置最大清晰度比例
+                const scale = 5;  // 直接设置为5，获取最高清晰度
+                
+                // 设置canvas尺寸为原图的scale倍
+                canvas.width = originalWidth * scale;
+                canvas.height = originalHeight * scale;
+                
+                // 将SVG渲染到canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, originalWidth * scale, originalHeight * scale);
+                
+                // 启用下载按钮
+                downloadBtn.disabled = false;
+
+                // 设置下载链接
+                downloadBtn.onclick = function() {
+                    const pngDataUrl = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = pngDataUrl;
+                    link.download = 'image.png';
+                    link.click();
+                };
+            };
+            img.src = svgUrl;
+        }
+    </script>
+</body>
+</html>
