@@ -1,91 +1,170 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>吾家小狐的小站</title>
+    <title>个人中心</title>
+    <style>
+        body {
+            background: #F0F4E9;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #E0E7FF;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .username {
+            font-size: 28px;
+            text-align: center;
+            color: #2C3E50;
+            margin-bottom: 15px;
+        }
+        .bio {
+            text-align: center;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 20px;
+            color: #34495E;
+            border-bottom: 2px solid #A3D0C3;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        .work-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .work-thumbnail {
+            width: 120px;
+            height: 80px;
+            background: #E5E9F2;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        .work-content {
+            flex-grow: 1;
+        }
+        .work-title {
+            font-size: 18px;
+            color: #2C3E50;
+            margin: 0 0 8px;
+        }
+        .work-desc {
+            color: #7F8C8D;
+            line-height: 1.4;
+        }
+        .blog-item {
+            background: #F8F9FA;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .blog-title {
+            color: #3498DB;
+            font-size: 16px;
+            margin: 0 0 5px;
+        }
+        .blog-date {
+            color: #95A5A6;
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .work-item { flex-direction: column; }
+            .work-thumbnail { width: 100%; height: 160px; }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>欢迎来到我的网站</h1>
-    </header>
-    
-    <nav>
-        <ul>
-            <li><a href="#home">主页</a></li>
-            <li><a href="#about">关于小狐狸</a></li>
-            <li><a href="#zuop">小狐狸的作品</a></li>
-            <li><a href="#saying">小狐狸的便签</a></li>
-            <li><a href="#services">服务</a></li>
-            <li><a href="#contact">联系</a></li>
-        </ul>
-    </nav>
+    <div class="profile-card">
+        <!-- 用户基本信息 -->
+        <div class="avatar">
+            <img src="https://via.placeholder.com/120" alt="用户头像">
+        </div>
+        <div class="username">书家家主-吾家小狐</div>
+        <div class="bio">
+            专注于UI/UX设计与后端开发，喜欢将艺术与技术结合创造优雅的数字体验
+        </div>
+        
+        <div class="section">
+            <div class="section-title">关于小狐狸</div>
+            <div class="work-item">
+                <div class="work-content">
+                    <div class="work-desc">男生♂，15岁
+数学，化学，英语，电学，furry，小说，绘画<br>
+小学港宁小学，初中荷城初级中学<br>
+家乡广西贵港市，现居广西贵港市<br>
+梦幻工坊出版社社长</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 用户作品 -->
+        <div class="section">
+            <div class="section-title">作品集</div>
+            <div class="work-item">
+                <a href="http://sbox.yangyiit.top:2222/">
+                <div class="work-content">
+                    <div class="work-title">小盒子社区</div>
+                    <div class="work-desc">基于Python的flask框架设计非响应式布局</div>
+                </div>
+                </a>
+            </div>
+            <!-- 更多作品项 -->
+        </div>
 
-    <section id="home">
-        <h2>主页内容</h2>
-        <p>这里是一只小狐狸的主页</p>
-    </section>
-
-    <section id="about">
-        <h2>关于小狐狸</h2>
-        <p>男生♂，15岁</p>
-        <p>数学，化学，英语，电学，furry，小说，绘画</p>
-        <p>小学港宁小学，初中荷城初级中学</p>
-        <p>家乡广西贵港市，现居广西贵港市</p>
-        <p>梦幻工坊出版社社长</p>
-    </section>
-    
-    <section id="zuop">
-        <h2>我的作品</h2>
-        <h3>网页类</h3>
-        <ul>
-            <li><a href="https://shunianssy.github.io/Dreamworkshop.github.io/couqian.html">抽签小工具</a></li>
-            <li><a href="https://gp0.saobby.com/i/nikoakckld9zcxau">fox math4</a></li>
-        </ul>
-        <h3>本地工具类</h3>
-        <ul>
-            <li><a href="https://shunianssy.lanzn.com/i10yW1rl1kkb">书念压缩1(密码:3141)</a></li>
-            <li><a href="https://shunianssy.lanzn.com/iPNny1kz1g3c">PyInstaller打包工具</a></li>
-            <li><a href="https://shunianssy.lanzn.com/ifFxY15msc2b">视频加速器</a></li>
-            <li><a href="https://shunianssy.lanzn.com/ijKxE2fypxpa">fox math4</a></li>
-        </ul>
-        <h3>本地游戏类</h3>
-        <ul>
-            <li><a href="https://shunianssy.lanzn.com/iz8SM2fypxgb">卡牌纪元3</a></li>
-        </ul>
-    </section>
-    
-    <section id="saying">
-        <h2>小狐狸的便签</h2>
-        <p>我正常情况下还是非常诚实的人的，是什么就说什么，除非你是让我非常讨厌的人</p>
-        <p>不喜欢一大堆抽象的烂梗，只喜欢我家哥哥</p>
-        <p>正常情况下我是不会使用css的，如果你看到我用了，那就是用AI了，当然，我是现在开始学的</p>
-        <p></p>
-    </section>
-    
-    <section id="services">
-        <h2>服务</h2>
-        <p>关于梦幻工坊出版社所有网站应用所使用的广告都是我进行管理的，现在进行广告招商，每元投放12次横幅广告，有意向的联系我</p>
-        <p style="color:red">在广告投放中书念集团和提供服务器的阳毅工作室可以免费投放每月1000次</p>
-    </section>
-
-    <section id="contact">
-        <h2>小狐狸的社交账号</h2>
-        <a style="color:black" href="https://m.bilibili.com/space/3493133419546943">bilbil</a>
-        <a style="color:black" href="https://www.luogu.com.cn/user/1044250">洛谷</a>
-        <a style="color:black" href="https://shequ.codemao.cn/mobile/user/1861078241">编程猫</a>
-        <a style="color:black" href="https://www.40code.com/#page=user&id=2117">40code</a>
-        <a style="color:black" href="https://gitblock.cn/Users/1253406#">稽木世界</a>
-        <a style="color:black" href="https://codingclip.com/user/1730">别针社区</a>
-        <a style="color:black" href="https://www.scratch-cn.cn/user/project?comid=62de2183eb4cb719842e8452">scratch中社</a>
-        <a style="color:black" href="https://m-world.xiaomawang.com/main/person/3239558">小码王</a>
-        <h2>如何联系小狐狸</h2>
-        <p>QQ:399781969</p>
-        <p style="color:red">注意:有且只有QQ可以与我进行商业合作，且合作内容必须为正常</p>
-    </section>
-
-    <footer>
-        <p>© 2025 小狐狸书念-网站版权所有</p>
-    </footer>
+        <!-- 用户博客 -->
+        <div class="section">
+            <div class="section-title">最新博客</div>
+            <a href="https://www.luogu.com.cn/article/yhx9c8tb">
+            <div class="blog-item">
+                <div class="blog-title">一堆有用的小工具</div>
+                <div class="blog-date">2025-4-5</div>
+            </div>
+            </a>
+            <a href="https://www.luogu.com.cn/article/ad0nnlt3">
+            <div class="blog-item">
+                <div class="blog-title">我的社交账号集</div>
+                <div class="blog-date">2025-4-2</div>
+            </div>
+            </a>
+            <a href="https://space.bilibili.com/3493133419546943">
+            <div class="blog-item">
+                <div class="blog-title">点击跳转我的b站账号</div>
+                <div class="blog-date">2024-9-6</div>
+            </div>
+            </a>
+        </div>
+    </div>
 </body>
 </html>
