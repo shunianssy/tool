@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blockly 自定义编程环境</title>
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://unpkg.com/blockly/python_compressed.js"></script>
+    <style>
+        #blocklyDiv { 
+            height: 500px; 
+            width: 700px; 
+            border: 1px solid #ccc; 
+            float: left;
+        }
+        #pythonCode { 
+            width: 700px; 
+            height: 200px; 
+            margin: 10px 0; 
+            font-family: monospace; 
+            clear: both;
+        }
+        .custom-block { 
+            margin: 15px 0; 
+            padding: 10px; 
+            background: #f5f5f5; 
+            border-radius: 4px;
+        }
+        .blocklyToolboxDiv {
+            max-height: 500px !important; 
+            overflow-y: auto !important;
+            scrollbar-width: thin;
+        }
+        .blocklyTreeRow {
+            height: 28px !important;
+            padding: 0 4px !important;
+        }
+        /* 新增样式修复工具箱显示问题 */
+        .blocklyTreeRow > div {
+            height: 28px !important;
+        }
+        .blocklyTreeRow > div > div {
+            height: 24px !important;
+        }
+    </style>
+</head>
+<body>
+    <h3>可视化编程工作区</h3>
+    <div id="blocklyDiv"></div>
+
+    <div class="custom-block">
+        <h4>创建自定义功能块</h4>
+        <input type="text" id="blockName" placeholder="功能块名称（如：数据计算）" />
+        <textarea id="pythonTemplate" placeholder="Python模板（使用[参数名]占位）\n例：result = [数值1] + [数值2]"></textarea>
+        <button onclick="createCustomBlock()">创建功能块</button>
+    </div>
+
+    <h3>生成的 Python 代码</h3>
+    <textarea id="pythonCode" readonly></textarea>
+    <button onclick="generatePythonCode()">生成代码</button>
+
+    <script>
+        // 动态维护的工具箱结构
+        let dynamicToolbox = `
+            <xml>
+                <category name="基础组件" colour="#4285F4">
+                    <category name="控制结构">
+                        <block type="controls_if"></block>
+                        <block type="controls_repeat_ext"></block>
+                    </category>
+                    <category name="数学运算">
+                        <block type="math_number"></block>
+                        <block type="math_arithmetic"></block>
+                    </category>
+                    <category name="文本操作">
+                        <block type="text"></block>
+                        <block type="text_print"></block>
+                        <block type="text_join"></block>
+                    </category>
+                    <category name="函数">
+                        <block type="procedures_defnoreturn"></block>
+                        <block type="procedures_callnoreturn"></block>
+                    </category>
+                </category>
+                <category name="自定义功能" id="custom_blocks" colour="#34A853">
+                    <!-- 动态填充 -->
+                </category>
+            </xml>`;
+
+        // 初始化工作区
+        const workspace = Blockly.inject('blocklyDiv', {
+            toolbox: dynamicToolbox,
+            media: 'https://blockly-demo.appspot.com/static/media/',
+            toolboxPosition: 'start',
+            grid: { spacing: 20, length: 3 } // 新增网格配置
+        });
+
+        // 预加载示例模块：自定义类型（已修正）
+        (function createPredefinedBlock() {
+            const blockName = '自定义类型';
+            const pythonTemplate = 'print([a])';
+
+            // 注册块定义（按新规范）
+            Blockly.Blocks[blockName] = {
+                init: function() {
+                    this.appendValueInput('PARAM')
+                        .setCheck(null)
+                        .appendField("打印");
+                    this.setPreviousStatement(true);
+                    this.setNextStatement(true);
+                    this.setColour(230); // 使用新颜色代码
+                    this.setTooltip("打印参数");
+                    this.setHelpUrl("https://example.com");
+                }
+            };
+
+            // 注册Python生成器（修正命名空间）
+            Blockly.Python.forBlock[blockName] = function(block, generator) {
+                const param = generator.valueToCode(block, 'PARAM', Blockly.Python.ORDER_ATOMIC);
+                return `print(${param})\n`;
+            };
+
+            // 更新工具箱
+            let toolboxDom = Blockly.Xml.textToDom(dynamicToolbox);
+            const customCategory = toolboxDom.getElementById('custom_blocks');
+            const blockNode = Blockly.utils.xml.createElement('block');
+            blockNode.setAttribute('type', blockName);
+            customCategory.appendChild(blockNode);
+            
+            dynamicToolbox = Blockly.Xml.domToPrettyText(toolboxDom);
+            workspace.updateToolbox(Blockly.Xml.textToDom(dynamicToolbox));
+            workspace.refreshToolbox();
+        })();
+
+        // 创建自定义块函数（已修正）
+        function createCustomBlock() {
+            const name = document.getElementById('blockName').value.trim();
+            const template = document.getElementById('pythonTemplate').value.trim();
+            
+            if (!name || !template) return alert('请输入完整信息');
+
+            // 验证块是否存在
+            let toolboxDom = Blockly.Xml.textToDom(dynamicToolbox);
+            const customCategory = toolboxDom.getElementById('custom_blocks');
+            if (customCategory.querySelector(`block[type="${name}"]`)) {
+                return alert('该功能块已存在');
+            }
+
+            // 注册块定义（按新规范）
+            Blockly.Blocks[name] = {
+                init: function() {
+                    this.appendDummyInput()
+                        .appendField(name); // 主标题
+                    
+                    const placeholders = template.match(/\[([^\]]+)\]/g) || [];
+                    placeholders.forEach(ph => {
+                        const key = ph.slice(1, -1);
+                        this.appendValueInput(key)
+                            .setCheck(null)
+                            .appendField(ph); // 显示占位符作为参数标签
+                    });
+
+                    this.setInputsInline(false);
+                    this.setPreviousStatement(true);
+                    this.setNextStatement(true);
+                    this.setColour(230); // 使用新颜色代码
+                    this.setTooltip("自定义功能块");
+                    this.setHelpUrl("https://example.com");
+                }
+            };
+
+            // 注册Python生成器（修正顺序参数）
+            Blockly.Python.forBlock[name] = function(block, generator) {
+                const args = {};
+                const placeholders = template.match(/\[([^\]]+)\]/g) || [];
+                
+                placeholders.forEach(ph => {
+                    const key = ph.slice(1, -1);
+                    args[key] = generator.valueToCode(block, key, Blockly.Python.ORDER_ATOMIC) || 'None';
+                });
+                
+                return template.replace(/\[([^\]]+)\]/g, (m) => args[m.slice(1, -1)]) + '\n';
+            };
+
+            // 更新工具箱
+            toolboxDom = Blockly.Xml.textToDom(dynamicToolbox);
+            const newBlockNode = Blockly.utils.xml.createElement('block');
+            newBlockNode.setAttribute('type', name);
+            toolboxDom.getElementById('custom_blocks').appendChild(newBlockNode);
+            
+            dynamicToolbox = Blockly.Xml.domToPrettyText(toolboxDom);
+            workspace.updateToolbox(Blockly.Xml.textToDom(dynamicToolbox));
+            workspace.refreshToolbox();
+        }
+
+        // 代码生成函数（已修正）
+        function generatePythonCode() {
+            try {
+                Blockly.Python.init(workspace);
+                const code = Blockly.Python.workspaceToCode(workspace);
+                document.getElementById('pythonCode').value = code;
+            } catch (e) {
+                alert(`代码生成错误：${e.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
