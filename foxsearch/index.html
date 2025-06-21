@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小狐网址导航</title>
+    <style>
+        /* 基本样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #331;
+        }
+
+        /* 网站标题 */
+        header {
+            background-color: #3498db; /* 修正多余的分号 */
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        /* 网格容器 */
+        .site-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* 单个网站块 */
+        .site {
+            text-align: center;
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .site:hover {
+            transform: scale(1.05);
+        }
+
+        .site img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
+
+        .site a {
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* 站点标题样式 */
+        h4 {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        /* 手机端适配 */
+        @media (max-width: 768px) {
+            .site-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* 小屏幕适配 */
+        @media (max-width: 480px) {
+            .site img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .site a {
+                font-size: 12px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <p>小狐网址导航-快速寻找网站</p>
+    </header>
+
+    <h4>常用网站</h4>
+    <div class="site-grid">
+        <div class="site">
+            <a href="https://m.bilibili.com" target="_blank">
+                <img src="/">
+                <p>Bilibili</p>
+            </a>
+        </div>
+        <div class="site">
+            <a href="https://www.qq.com" target="_blank">
+                <img src="">
+                <p>腾讯</p>
+            </a>
+        </div>
+        <div class="site">
+            <a href="https://www.sina.com.cn" target="_blank">
+                <img src="">
+                <p>新浪</p>
+            </a>
+        </div>
+        <div class="site">
+            <a href="http://sbox.yangyiit.top:2222/" target="_blank">
+                <img src="">
+                <p>小盒子社区</p>
+            </a>
+        </div>
+        <div class="site">
+            <a href="https://preview-db.yearnstudio.cn/login?ui=1" target="_blank">
+                <img src="">
+                <p>ShangCloud</p>
+            </a>
+        </div>
+        <div class="site">
+            <a href="https://zerocat.houlangs.com//" target="_blank">
+                <img src="">
+                <p>zerocat</p>
+            </a>
+        </div>
+        <div class="site">
+            <a href="https://github.com/" target="_blank">
+                <img src="">
+                <p>github</p>
+            </a>
+        </div>
+        <div class="site">
+            <a href="https://www.rainyun.com/NjQwNjg5_" target="_blank">
+                <img src="">
+                <p>雨云-更便宜</p>
+            </a>
+        </div>
+
+        <div class="site">
+            <a href="https://gitee.com/" target="_blank">
+                <img src="">
+                <p>gitee</p>
+            </a>
+        </div>
+    </div>
+
+    <h4>常用软件下载</h4>
+    <div class="site-grid">
+        <div class="site">
+            <a href="https://weixin.qq.com" target="_blank">
+                <img src="">
+                <p>微信</p>
+            </a>
+        </div>
+        <div class="site">
+            <a href="https://www.douyin.com" target="_blank">
+                <img src="">
+                <p>抖音</p>
+            </a>
+        </div>
+        <div class="site">
+            <img src="">
+            <a href="https://www.python.org/" target="_blank">
+                <p>Python</p>
+            </a>
+        </div>
+        <div class="site">
+            <img src="">
+            <a href="https://shunianssy.lanzouu.com/iSsoF2z97qhc
+" target="_blank">
+                <p>Python第三方下载(密码:myfox)</p>
+            </a>
+        </div>
+        <div class="site">
+            <a href="https://store.steampowered.com/" target="_blank">
+                <img src="">
+                <p>steam</p>
+            </a>
+        </div>
+        <div class="site">
+            <a href="https://www.huorong.cn//" target="_blank">
+                <img src="">
+                <p>火绒安全</p>
+            </a>
+        </div>
+    </div>
+    
+    <h4>好用的网盘</h4>
+    <div class="site-grid">
+        <div class="site">
+            <img src="">
+            <a href="https://www.lanzou.com/?ref=www.ziyuan.tv" target="_blank">
+                <p>蓝奏云</p>
+                
+            </a>
+        </div>
+        <div class="site">
+            <a href="https://www.123pan.com/?notoken=1" target="_blank">
+                <img src="">
+                <p>123云盘</p>
+            </a>
+        </div>
+    </div>
+    <o>如果你知道更多网站，可以发邮件(图标+名称+网址)到shunianofficial@163.com</p>
+</body>
+</html>
