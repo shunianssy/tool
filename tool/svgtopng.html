@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG转PNG</title>
+    <style>
+        /* 全局样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom right, #b3e0f2, #ffffff);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #4a90e2;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* 文件上传控件 */
+        input[type="file"] {
+            padding: 10px 20px;
+            border: 2px dashed #4a90e2;
+            border-radius: 8px;
+            background-color: #e6f2fa;
+            color: #4a90e2;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        input[type="file"]:hover {
+            background-color: #cceeff;
+        }
+
+        /* 滑动条样式容器 */
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px 0;
+        }
+
+        label {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: #4a90e2;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: linear-gradient(to right, #4a90e2, #b3e0f2);
+            outline: none;
+            transition: background 0.3s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #4a90e2;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #4a90e2;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .scale-value {
+            margin-top: 8px;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+
+        /* 下载按钮 */
+        #downloadBtn {
+            padding: 12px 24px;
+            font-size: 1rem;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #downloadBtn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #downloadBtn:hover:not(:disabled) {
+            background-color: #357ab8;
+        }
+
+        /* canvas 隐藏 */
+        #canvas {
+            display: none;
+        }
+
+        /* 链接样式 */
+        a {
+            margin-top: 30px;
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #2c6fb5;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>SVG格式转换为PNG格式</h1>
+
+    <input type="file" id="upload" accept=".svg"/>
+
+    <div class="slider-container">
+        <label for="scaleControl">调整清晰度:</label>
+        <input type="range" id="scaleControl" min="1" max="5" step="0.1" value="5">
+        <span class="scale-value" id="scaleValue">5</span>
+    </div>
+
+    <button id="downloadBtn" disabled>下载转换PNG文件</button>
+
+    <canvas id="canvas"></canvas>
+
+    <a href="https://m.bilibili.com/space/3493133419546943">关注作者的Bilibili</a>
+
+    <script>
+        // 获取DOM元素
+        const uploadInput = document.getElementById('upload');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const scaleControl = document.getElementById('scaleControl');
+        const scaleValue = document.getElementById('scaleValue');
+
+        // 更新显示的清晰度值
+        scaleControl.addEventListener('input', function() {
+            scaleValue.textContent = scaleControl.value;
+        });
+
+        // 处理文件上传
+        uploadInput.addEventListener('change', handleFileUpload);
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const svgContent = e.target.result;
+                    convertSVGToPNG(svgContent);
+                };
+                reader.readAsText(file);
+            } else {
+                alert('请上传有效的SVG文件。');
+            }
+        }
+
+        // 转换SVG到PNG
+        function convertSVGToPNG(svgContent) {
+            const img = new Image();
+            const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+            const svgUrl = URL.createObjectURL(svgBlob);
+            
+            img.onload = function() {
+                // 获取SVG的原始宽高
+                const originalWidth = img.width || 200;  // 默认尺寸
+                const originalHeight = img.height || 200;
+
+                // 动态获取scale值
+                const scale = parseFloat(scaleControl.value);
+                
+                // 设置canvas尺寸
+                canvas.width = originalWidth * scale;
+                canvas.height = originalHeight * scale;
+                
+                // 清空画布并绘制
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, originalWidth * scale, originalHeight * scale);
+                
+                // 启用下载按钮
+                downloadBtn.disabled = false;
+
+                // 下载逻辑
+                downloadBtn.onclick = function() {
+                    const pngDataUrl = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = pngDataUrl;
+                    link.download = 'converted_image.png';
+                    link.click();
+                };
+            };
+            img.src = svgUrl;
+        }
+    </script>
+
+</body>
+</html>
