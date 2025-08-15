@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🎵 调音器 & 节拍器</title>
+    <title>书家音乐</title> 
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -12,7 +12,7 @@
         }
         body {
           font-family: 'Nunito', sans-serif;
-          background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+          background: linear-gradient(135deg, #a2e4f0 0%, #6dd5ed 100%);
           color: #333;
           margin: 0;
           padding: 20px;
@@ -94,15 +94,32 @@
           border: 2px dashed #3498db;
           border-radius: 12px;
           padding: 20px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 150px;
         }
         .note-display:hover {
           transform: scale(1.05);
           background-color: #f8f9fa;
         }
-        .note-display small {
-          font-size: 24px;
-          color: #7f8c8d;
+        
+        /* 音符显示优化 */
+        .note-main {
+          font-size: 72px;
+          line-height: 1;
         }
+        .note-accidental {
+          font-size: 48px;
+          vertical-align: super;
+          margin-left: -5px;
+        }
+        .note-octave {
+          font-size: 48px;
+          vertical-align: sub;
+          margin-left: -5px;
+        }
+        
         .frequency {
           text-align: center;
           font-size: 20px;
@@ -321,6 +338,37 @@
         .beat-active {
           opacity: 1;
         }
+        
+        /* 错误信息 */
+        .error-message {
+          text-align: center;
+          color: #e74c3c;
+          font-weight: 600;
+          margin-top: 10px;
+          min-height: 24px;
+        }
+        
+        /* 音符历史 */
+        .note-history {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          margin-top: 20px;
+          flex-wrap: wrap;
+        }
+        .note-history-item {
+          background: #f1f3f5;
+          padding: 5px 10px;
+          border-radius: 5px;
+          font-size: 14px;
+        }
+        
+        /* 音符显示容器 */
+        .note-container {
+          display: flex;
+          align-items: baseline;
+          justify-content: center;
+        }
     </style>
 </head>
 
@@ -328,19 +376,16 @@
 
     <div class="container">
         <header>
-            <h1>🎸 调音器 & 🥁 节拍器</h1>
+            <h1>书家音乐</h1>
         </header>
 
-        <!-- 选项卡 -->
         <div class="tabs">
             <button class="tab active" data-tab="tuner">调音器</button>
             <button class="tab" data-tab="metronome">节拍器</button>
         </div>
-
-        <!-- 调音器 -->
+        
         <div id="tuner" class="tab-content active">
             <h2>实时调音器</h2>
-            <p>使用麦克风检测音高，支持 440Hz / 442Hz 标准音</p>
 
             <div class="tuner-controls">
                 <label>标准音: </label>
@@ -365,7 +410,9 @@
             </div>
 
             <div class="note-display" id="note-display">
-                A
+                <div class="note-container">
+                    <span class="note-main">A</span>
+                </div>
                 <div id="tuner-needle" style="width: 4px; height: 60px; background: red; margin: 10px auto; transition: transform 0.1s ease;"></div>
             </div>
             <div class="frequency" id="frequency">频率: 0.00 Hz</div>
@@ -374,23 +421,24 @@
                 <div class="accuracy-bar" id="accuracy-bar"></div>
                 <div class="needle"></div>
             </div>
+            
+            <div class="error-message" id="error-message"></div>
+            
+            <div class="note-history" id="note-history"></div>
 
-            <!-- 自定义调音 -->
             <div class="custom-tuning">
                 <h3>🔧 自定义调音</h3>
                 <div id="strings"></div>
                 <div class="add-share-btns">
-                    <button class="btn btn-primary" id="add-string">➕ 添加弦</button>
-                    <button class="btn btn-success" id="share-tuning">🔗 分享调音</button>
+                    <button class="btn btn-primary" id="add-string">添加弦</button>
+                    <button class="btn btn-success" id="share-tuning">分享调音</button>
                 </div>
                 <div id="share-link" class="share-link"></div>
             </div>
         </div>
 
-        <!-- 节拍器 -->
         <div id="metronome" class="tab-content">
             <h2>节拍器</h2>
-            <p>支持多种音色，可上传自定义声音</p>
 
             <div class="metronome-controls">
                 <label>BPM: </label>
@@ -414,22 +462,19 @@
                 </select>
 
                 <input type="file" id="custom-sound-upload" accept="audio/*" style="display:none;" />
-                <button class="btn" id="upload-sound-btn">📁 上传音色</button>
+                <button class="btn" id="upload-sound-btn">上传音色</button>
 
-                <button class="btn btn-primary" id="start-metronome">▶️ 开始</button>
-                <button class="btn" id="stop-metronome">⏹️ 停止</button>
+                <button class="btn btn-primary" id="start-metronome">开始</button>
+                <button class="btn" id="stop-metronome">停止</button>
             </div>
 
-            <!-- 手打节拍 -->
             <div class="tap-area">
-                <button id="tap-tempo">🔘 点我打拍子</button>
+                <button id="tap-tempo">点我打拍子</button>
                 <p>计算 BPM: <strong><span id="calculated-bpm">0</span></strong></p>
             </div>
-
-            <!-- 节拍视觉反馈 -->
+            
             <div class="beat-indicator" id="beat-indicator"></div>
 
-            <!-- 看谱 -->
             <div class="score-view" id="score-view">
                 当前节奏谱（4/4）：<br>
                 | 1 &nbsp; & &nbsp; 2 &nbsp; & &nbsp; 3 &nbsp; & &nbsp; 4 &nbsp; & |
@@ -438,14 +483,13 @@
         </div>
 
         <footer>
-            &copy; 2025 调音节拍器工具 | 支持离线使用
+            &copy; 2025 书念软件 | 鱼干网络科技 版权所有
         </footer>
     </div>
 
     <script>
         // ========================
         // 全局音频上下文
-        // ========================
         let audioContext = null;
         let analyser = null;
         let micStream = null;
@@ -458,7 +502,11 @@
         let drumSoundBuffer = null;
         let isUserGesture = false;
         
-        // 初始化音频上下文（用户手势触发）
+        let lastValidNote = 'A';
+        let lastValidFrequency = 440.00;
+        let lastValidCents = 0;
+        let noteHistory = [];
+        
         function initAudio() {
           if (audioContext) return Promise.resolve();
           return new Promise((resolve, reject) => {
@@ -476,7 +524,6 @@
         
         // ========================
         // 调音器：启动麦克风
-        // ========================
         async function startTuner() {
           if (!isUserGesture) {
             document.getElementById('mic-status').innerHTML = '<span class="status-indicator status-inactive"></span>请先点击页面任意位置激活音频';
@@ -494,6 +541,7 @@
         
             tunerRunning = true;
             document.getElementById('mic-status').innerHTML = '<span class="status-indicator status-active"></span>麦克风已启用';
+            document.getElementById('error-message').textContent = '';
             runTunerLoop();
           } catch (err) {
             document.getElementById('mic-status').innerHTML = '<span class="status-indicator status-inactive"></span>无法访问麦克风，请检查权限';
@@ -509,8 +557,7 @@
           tunerRunning = false;
           document.getElementById('mic-status').innerHTML = '<span class="status-indicator status-inactive"></span>点击表盘获取麦克风权限';
         }
-        
-        // 实时音高检测主循环
+      
         function runTunerLoop() {
           if (!tunerRunning) return;
         
@@ -518,48 +565,77 @@
           analyser.getFloatTimeDomainData(buffer);
         
           const freq = detectPitch(buffer, audioContext.sampleRate);
-          if (freq) {
+          
+          if (freq && !isNaN(freq) && freq > 0) {
             const noteInfo = getNoteNameAndCents(freq);
-            updateTunerDisplay(noteInfo.note, noteInfo.cents, freq);
+            if (noteInfo && noteInfo.note) {
+              lastValidNote = noteInfo.note;
+              lastValidFrequency = noteInfo.freq;
+              lastValidCents = noteInfo.cents;
+              updateTunerDisplay(noteInfo.note, noteInfo.cents, freq);
+              addToNoteHistory(noteInfo.note);
+              document.getElementById('error-message').textContent = '';
+            } else {
+              updateTunerDisplay(lastValidNote, lastValidCents, lastValidFrequency);
+              document.getElementById('error-message').textContent = '音高检测异常，显示上次有效值';
+            }
+          } else if (freq === null) {
+            updateTunerDisplay(lastValidNote, lastValidCents, lastValidFrequency);
+            document.getElementById('error-message').textContent = '未检测到声音，显示上次有效值';
+          } else {
+            updateTunerDisplay(lastValidNote, lastValidCents, lastValidFrequency);
+            document.getElementById('error-message').textContent = '音高检测出错，显示上次有效值';
           }
         
           requestAnimationFrame(runTunerLoop);
         }
         
-        // 简单音高检测（自相关算法）
         function detectPitch(buffer, sampleRate) {
-          let maxOffset = Math.floor(buffer.length / 2);
-          let bestOffset = -1;
-          let bestCorrelation = 0;
+          const bufferSize = buffer.length;
+          
           let rms = 0;
-        
-          // 计算 RMS（音量）
-          for (let i = 0; i < buffer.length; i++) {
+          for (let i = 0; i < bufferSize; i++) {
             rms += buffer[i] * buffer[i];
           }
-          rms = Math.sqrt(rms / buffer.length);
-          if (rms < 0.01) return -1; // 静音
-        
-          // 自相关
-          for (let offset = 20; offset < maxOffset; offset++) {
+          rms = Math.sqrt(rms / bufferSize);
+          
+          if (rms < 0.01) return null;
+          
+          let bestOffset = -1;
+          let bestCorrelation = 0;
+          const maxOffset = Math.floor(bufferSize / 2);
+          
+          const minOffset = Math.max(20, Math.floor(sampleRate / 2000)); // 最高2000Hz
+          const maxSearchOffset = Math.min(maxOffset, Math.floor(sampleRate / 50)); // 最低50Hz
+          
+          for (let offset = minOffset; offset < maxSearchOffset; offset++) {
             let correlation = 0;
-            for (let i = 0; i < buffer.length - offset; i++) {
-              correlation += Math.abs(buffer[i] - buffer[i + offset]);
+            for (let i = 0; i < bufferSize - offset; i++) {
+              correlation += buffer[i] * buffer[i + offset];
             }
-            correlation = 1.0 / (correlation / (buffer.length - offset));
+            
             if (correlation > bestCorrelation) {
               bestCorrelation = correlation;
               bestOffset = offset;
             }
           }
-        
-          if (bestOffset === -1 || bestCorrelation < 0.01) return null;
-        
-          return sampleRate / bestOffset;
+          
+          if (bestOffset === -1 || bestCorrelation < 0.1) {
+            return null;
+          }
+         
+          const frequency = sampleRate / bestOffset;
+          
+          if (frequency < 20 || frequency > 20000) {
+            return null;
+          }
+          
+          return frequency;
         }
         
-        // 音名 + 偏移（升降音）计算
         function getNoteNameAndCents(freq) {
+          if (!freq || isNaN(freq) || freq <= 0) return null;
+          
           const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
           const A4 = parseFloat(document.getElementById('standard-pitch').value); // 440 or 442
           const a4Index = 69; // MIDI number of A4
@@ -568,13 +644,35 @@
           const rounded = Math.round(noteNumber);
           const cents = Math.round((noteNumber - rounded) * 100);
         
-          const note = noteNames[rounded % 12] + Math.floor((rounded + 9) / 12);
+          const noteIndex = (rounded % 12 + 12) % 12;
+          const octave = Math.floor((rounded + 9) / 12);
+          
+          const note = noteNames[noteIndex] + octave;
           return { note, cents, freq };
         }
         
-        // 更新调音器 UI
+
         function updateTunerDisplay(note, cents, freq) {
-          document.getElementById('note-display').textContent = note;
+          let mainNote = note.charAt(0);
+          let accidental = '';
+          let octave = '';
+          
+          if (note.length > 1) {
+            if (note.charAt(1) === '#') {
+              accidental = '#';
+              octave = note.substring(2);
+            } else {
+              octave = note.substring(1);
+            }
+          }
+       
+          const noteContainer = document.querySelector('.note-container');
+          noteContainer.innerHTML = `
+            <span class="note-main">${mainNote}</span>
+            ${accidental ? `<span class="note-accidental">${accidental}</span>` : ''}
+            ${octave ? `<span class="note-octave">${octave}</span>` : ''}
+          `;
+          
           document.getElementById('frequency').textContent = `频率: ${freq.toFixed(2)} Hz`;
         
           const deviation = cents; // -100 ~ +100
@@ -584,6 +682,28 @@
             needle.style.transform = `translateX(${position}px)`;
             needle.style.backgroundColor = Math.abs(deviation) < 5 ? '#2ecc71' : '#e74c3c';
           }
+        }
+        
+        function addToNoteHistory(note) {
+          if (noteHistory.length === 0 || noteHistory[noteHistory.length - 1] !== note) {
+            noteHistory.push(note);
+            if (noteHistory.length > 10) {
+              noteHistory.shift();
+            }
+            updateNoteHistoryDisplay();
+          }
+        }
+        
+        function updateNoteHistoryDisplay() {
+          const historyContainer = document.getElementById('note-history');
+          historyContainer.innerHTML = '';
+          
+          noteHistory.forEach(note => {
+            const item = document.createElement('div');
+            item.className = 'note-history-item';
+            item.textContent = note;
+            historyContainer.appendChild(item);
+          });
         }
         
         // ========================
@@ -600,7 +720,7 @@
           oscillator.frequency.setValueAtTime(A4, audioContext.currentTime);
           oscillator.connect(audioContext.destination);
           oscillator.start();
-          setTimeout(stopReferenceTone, 1000); // 播放1秒
+          setTimeout(stopReferenceTone, 1000);
         }
         
         function stopReferenceTone() {
@@ -612,19 +732,15 @@
         
         // ========================
         // 节拍器：Web Audio 精确播放
-        // ========================
-        // 创建内置音色
         function createClickSoundBuffer() {
           const sampleRate = audioContext.sampleRate;
-          const duration = 0.05; // 50ms
+          const duration = 0.05;
           const numFrames = sampleRate * duration;
           const buffer = audioContext.createBuffer(1, numFrames, sampleRate);
           const data = buffer.getChannelData(0);
           
-          // 生成咔哒声
           for (let i = 0; i < numFrames; i++) {
             const t = i / sampleRate;
-            // 混合正弦波和白噪声
             const sine = Math.sin(2 * Math.PI * 880 * t) * Math.exp(-t * 20);
             const noise = (Math.random() * 2 - 1) * Math.exp(-t * 30);
             data[i] = (sine + noise * 0.3) * 0.5;
@@ -639,8 +755,7 @@
           const numFrames = sampleRate * duration;
           const buffer = audioContext.createBuffer(1, numFrames, sampleRate);
           const data = buffer.getChannelData(0);
-          
-          // 生成木鱼声
+         
           for (let i = 0; i < numFrames; i++) {
             const t = i / sampleRate;
             const frequency = 400 + 200 * Math.exp(-t * 30);
@@ -658,10 +773,8 @@
           const buffer = audioContext.createBuffer(1, numFrames, sampleRate);
           const data = buffer.getChannelData(0);
           
-          // 生成鼓声
           for (let i = 0; i < numFrames; i++) {
             const t = i / sampleRate;
-            // 低频正弦波 + 噪声
             const sine = Math.sin(2 * Math.PI * 80 * t) * Math.exp(-t * 10);
             const noise = (Math.random() * 2 - 1) * Math.exp(-t * 30);
             data[i] = (sine * 0.7 + noise * 0.3) * 0.5;
@@ -670,7 +783,6 @@
           return buffer;
         }
         
-        // 播放节拍音
         async function playBeat(isStrongBeat = false) {
           if (!isUserGesture) return;
           if (!audioContext) await initAudio();
@@ -678,11 +790,10 @@
           const source = audioContext.createBufferSource();
           const selected = document.getElementById('metronome-sound').value;
         
-          // 根据选择加载音色
+          // 根据选择加载音
           if (selected === 'custom' && customSoundBuffer) {
             source.buffer = customSoundBuffer;
           } else {
-            // 按需创建音色
             switch(selected) {
               case 'click':
                 if (!clickSoundBuffer) {
@@ -710,23 +821,20 @@
             }
           }
         
-          // 强拍音量更大
           const gainNode = audioContext.createGain();
           gainNode.gain.value = isStrongBeat ? 1.0 : 0.7;
           source.connect(gainNode);
           gainNode.connect(audioContext.destination);
           
           source.start();
-          
-          // 视觉反馈
+         
           const beatIndicator = document.getElementById('beat-indicator');
           beatIndicator.classList.add('beat-active');
           setTimeout(() => {
             beatIndicator.classList.remove('beat-active');
           }, 100);
         }
-        
-        // 启动节拍器
+       
         let beatCount = 0;
         function startMetronome() {
           if (!isUserGesture) {
@@ -744,7 +852,7 @@
           const interval = 60000 / bpm;
           beatCount = 0;
           
-          playBeat(true); // 第一拍（强拍）
+          playBeat(true);
           beatCount++;
           
           metronomeInterval = setInterval(() => {
@@ -761,7 +869,6 @@
           }
         }
         
-        // 上传自定义音色
         document.getElementById('custom-sound-upload').addEventListener('change', async (e) => {
           const file = e.target.files[0];
           if (!file) return;
@@ -774,7 +881,6 @@
         
         // ========================
         // 手打节拍 BPM 计算
-        // ========================
         let tapHistory = [];
         document.getElementById('tap-tempo').addEventListener('click', function () {
           const now = performance.now();
@@ -790,7 +896,6 @@
             const bpm = Math.round(60000 / avg);
             document.getElementById('calculated-bpm').textContent = bpm;
             
-            // 自动更新滑块
             document.getElementById('bpm-slider').value = bpm;
             document.getElementById('bpm-value').textContent = bpm;
           }
@@ -798,36 +903,29 @@
         
         // ========================
         // UI 初始化与事件绑定
-        // ========================
         window.addEventListener('load', () => {
-          // 绑定选项卡切换
           document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
-              // 移除所有活动状态
               document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
               document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
               
-              // 添加当前活动状态
               tab.classList.add('active');
               document.getElementById(tab.dataset.tab).classList.add('active');
             });
           });
           
-          // 绑定调音器表盘点击事件
           document.getElementById('note-display').addEventListener('click', () => {
             if (!tunerRunning) {
               startTuner();
             }
           });
           
-          // 绑定麦克风状态点击事件
           document.getElementById('mic-status').addEventListener('click', () => {
             if (!tunerRunning) {
               startTuner();
             }
           });
-        
-          // 绑定节拍器按钮
+       
           document.getElementById('start-metronome').addEventListener('click', () => {
             startMetronome();
           });
@@ -836,22 +934,18 @@
             stopMetronome();
           });
         
-          // 绑定 BPM 滑块同步
           const bpmSlider = document.getElementById('bpm-slider');
           const bpmValue = document.getElementById('bpm-value');
           bpmSlider.addEventListener('input', () => {
             bpmValue.textContent = bpmSlider.value;
           });
-        
-          // 绑定上传按钮
+       
           document.getElementById('upload-sound-btn').addEventListener('click', () => {
             document.getElementById('custom-sound-upload').click();
           });
         
-          // 初始化时同步 BPM 显示
           bpmValue.textContent = bpmSlider.value;
           
-          // 添加默认字符串
           addStringRow('E', 329.63);
           addStringRow('A', 220.00);
           addStringRow('D', 146.83);
@@ -859,14 +953,12 @@
           addStringRow('B', 123.47);
           addStringRow('E', 82.41);
           
-          // 用户手势检测
           document.body.addEventListener('click', function initUserGesture() {
             isUserGesture = true;
             document.body.removeEventListener('click', initUserGesture);
           }, { once: true });
         });
         
-        // 添加自定义调音行
         function addStringRow(note, frequency) {
           const container = document.getElementById('strings');
           const row = document.createElement('div');
@@ -878,18 +970,15 @@
           `;
           container.appendChild(row);
           
-          // 绑定删除按钮
           row.querySelector('.remove-string').addEventListener('click', () => {
             container.removeChild(row);
           });
         }
         
-        // 添加字符串按钮
         document.getElementById('add-string').addEventListener('click', () => {
           addStringRow('A', 440.00);
         });
-        
-        // 分享调音按钮
+       
         document.getElementById('share-tuning').addEventListener('click', () => {
           const strings = document.querySelectorAll('.string-row');
           const tuning = [];
