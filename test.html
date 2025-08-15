@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎵 调音器 & 节拍器</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+          box-sizing: border-box;
+        }
+        body {
+          font-family: 'Nunito', sans-serif;
+          background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+          color: #333;
+          margin: 0;
+          padding: 20px;
+          min-height: 100vh;
+        }
+        .container {
+          max-width: 960px;
+          margin: 0 auto;
+          background: #fff;
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        header {
+          background: #2c3e50;
+          color: white;
+          text-align: center;
+          padding: 20px;
+        }
+        h1 {
+          margin: 0;
+          font-size: 28px;
+          font-weight: 700;
+        }
+        
+        .tabs {
+          display: flex;
+          background: #f1f3f5;
+          border-bottom: 1px solid #ddd;
+        }
+        .tab {
+          flex: 1;
+          padding: 16px;
+          text-align: center;
+          font-size: 18px;
+          font-weight: 600;
+          color: #555;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+        .tab.active {
+          background: #3498db;
+          color: white;
+        }
+        
+        .tab-content {
+          display: none;
+          padding: 30px;
+        }
+        .tab-content.active {
+          display: block;
+        }
+        
+        /* 调音器样式 */
+        .tuner-controls {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 15px;
+          margin-bottom: 25px;
+          align-items: center;
+        }
+        .tuner-controls select {
+          padding: 10px 14px;
+          font-size: 16px;
+          border: 2px solid #ddd;
+          border-radius: 8px;
+          background: white;
+        }
+        .note-display {
+          font-size: 72px;
+          font-weight: bold;
+          text-align: center;
+          margin: 30px 0;
+          color: #2c3e50;
+          cursor: pointer;
+          position: relative;
+          transition: all 0.3s;
+          border: 2px dashed #3498db;
+          border-radius: 12px;
+          padding: 20px;
+        }
+        .note-display:hover {
+          transform: scale(1.05);
+          background-color: #f8f9fa;
+        }
+        .note-display small {
+          font-size: 24px;
+          color: #7f8c8d;
+        }
+        .frequency {
+          text-align: center;
+          font-size: 20px;
+          color: #34495e;
+        }
+        .accuracy {
+          height: 6px;
+          background: #ecf0f1;
+          border-radius: 3px;
+          margin: 20px auto;
+          width: 80%;
+          position: relative;
+        }
+        .accuracy-bar {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, #e74c3c, #f39c12, #2ecc71);
+          border-radius: 3px;
+          overflow: hidden;
+        }
+        .needle {
+          position: absolute;
+          top: 0;
+          left: 50%;
+          width: 2px;
+          height: 100%;
+          background: black;
+          transform: translateX(-50%);
+        }
+        
+        .mic-status {
+          text-align: center;
+          margin: 15px 0;
+          color: #e74c3c;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+          padding: 10px;
+          border-radius: 8px;
+          background-color: #f8f9fa;
+        }
+        .mic-status:hover {
+          color: #3498db;
+          background-color: #e3f2fd;
+        }
+        
+        /* 自定义调音 */
+        .custom-tuning {
+          margin-top: 30px;
+          padding: 20px;
+          background: #f8f9fa;
+          border-radius: 10px;
+        }
+        .string-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 12px;
+        }
+        .string-row input[type="text"] {
+          width: 100px;
+        }
+        .string-row input[type="number"] {
+          width: 100px;
+        }
+        .remove-string {
+          background: #e74c3c;
+          color: white;
+          border: none;
+          padding: 6px 10px;
+          border-radius: 6px;
+          cursor: pointer;
+        }
+        .add-share-btns {
+          display: flex;
+          gap: 10px;
+          margin-top: 10px;
+        }
+        .btn {
+          padding: 10px 16px;
+          font-size: 14px;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .btn-primary {
+          background: #3498db;
+          color: white;
+        }
+        .btn-success {
+          background: #2ecc71;
+          color: white;
+        }
+        .btn:hover {
+          transform: translateY(-2px);
+        }
+        .share-link {
+          margin-top: 10px;
+          padding: 10px;
+          background: #eee;
+          border-radius: 8px;
+          font-size: 14px;
+          word-break: break-all;
+          display: none;
+        }
+        
+        /* 节拍器 */
+        .metronome-controls {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 15px;
+          margin-bottom: 25px;
+          align-items: center;
+        }
+        #bpm-slider {
+          width: 150px;
+        }
+        #bpm-value {
+          font-size: 24px;
+          font-weight: bold;
+          color: #2c3e50;
+        }
+        #upload-sound-btn, #tap-tempo {
+          font-size: 16px;
+        }
+        
+        .tap-area {
+          text-align: center;
+          margin: 30px 0;
+        }
+        #tap-tempo {
+          padding: 15px 40px;
+          font-size: 18px;
+          background: #3498db;
+          color: white;
+          border: none;
+          border-radius: 50px;
+          cursor: pointer;
+          box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        #tap-tempo:active {
+          transform: scale(0.95);
+        }
+        
+        .score-view {
+          margin-top: 30px;
+          padding: 20px;
+          background: #f0f0f0;
+          border-radius: 10px;
+          font-family: monospace;
+          font-size: 18px;
+          line-height: 1.8;
+          text-align: center;
+          border: 1px dashed #ccc;
+        }
+        
+        footer {
+          text-align: center;
+          padding: 20px;
+          color: #7f8c8d;
+          font-size: 14px;
+        }
+        
+        @media (max-width: 600px) {
+          .tuner-controls, .metronome-controls {
+            flex-direction: column;
+            align-items: stretch;
+          }
+          #bpm-slider { width: 100%; }
+        }
+        
+        /* 加载动画 */
+        .loading {
+          display: inline-block;
+          width: 20px;
+          height: 20px;
+          border: 3px solid rgba(255,255,255,.3);
+          border-radius: 50%;
+          border-top-color: #fff;
+          animation: spin 1s ease-in-out infinite;
+          margin-left: 10px;
+          vertical-align: middle;
+        }
+        
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        
+        /* 状态指示器 */
+        .status-indicator {
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          margin-right: 8px;
+        }
+        .status-active {
+          background-color: #2ecc71;
+        }
+        .status-inactive {
+          background-color: #e74c3c;
+        }
+        
+        /* 节拍器视觉反馈 */
+        .beat-indicator {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background-color: #3498db;
+          margin: 20px auto;
+          opacity: 0;
+          transition: opacity 0.1s;
+        }
+        .beat-active {
+          opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🎸 调音器 & 🥁 节拍器</h1>
+        </header>
+
+        <!-- 选项卡 -->
+        <div class="tabs">
+            <button class="tab active" data-tab="tuner">调音器</button>
+            <button class="tab" data-tab="metronome">节拍器</button>
+        </div>
+
+        <!-- 调音器 -->
+        <div id="tuner" class="tab-content active">
+            <h2>实时调音器</h2>
+            <p>使用麦克风检测音高，支持 440Hz / 442Hz 标准音</p>
+
+            <div class="tuner-controls">
+                <label>标准音: </label>
+                <select id="standard-pitch">
+                    <option value="440">A4 = 440 Hz</option>
+                    <option value="442">A4 = 442 Hz</option>
+                </select>
+
+                <label>乐器: </label>
+                <select id="instrument-presets">
+                    <option value="">自定义</option>
+                    <option value="guitar">吉他</option>
+                    <option value="bass">贝斯</option>
+                    <option value="ukulele">尤克里里</option>
+                    <option value="violin">小提琴</option>
+                </select>
+            </div>
+
+            <div class="mic-status" id="mic-status">
+                <span class="status-indicator status-inactive"></span>
+                点击表盘获取麦克风权限
+            </div>
+
+            <div class="note-display" id="note-display">
+                A
+                <div id="tuner-needle" style="width: 4px; height: 60px; background: red; margin: 10px auto; transition: transform 0.1s ease;"></div>
+            </div>
+            <div class="frequency" id="frequency">频率: 0.00 Hz</div>
+
+            <div class="accuracy">
+                <div class="accuracy-bar" id="accuracy-bar"></div>
+                <div class="needle"></div>
+            </div>
+
+            <!-- 自定义调音 -->
+            <div class="custom-tuning">
+                <h3>🔧 自定义调音</h3>
+                <div id="strings"></div>
+                <div class="add-share-btns">
+                    <button class="btn btn-primary" id="add-string">➕ 添加弦</button>
+                    <button class="btn btn-success" id="share-tuning">🔗 分享调音</button>
+                </div>
+                <div id="share-link" class="share-link"></div>
+            </div>
+        </div>
+
+        <!-- 节拍器 -->
+        <div id="metronome" class="tab-content">
+            <h2>节拍器</h2>
+            <p>支持多种音色，可上传自定义声音</p>
+
+            <div class="metronome-controls">
+                <label>BPM: </label>
+                <input type="range" min="40" max="200" value="120" id="bpm-slider" />
+                <span id="bpm-value">120</span>
+
+                <label>拍号: </label>
+                <select id="time-signature">
+                    <option>4/4</option>
+                    <option>3/4</option>
+                    <option>6/8</option>
+                    <option>2/4</option>
+                </select>
+
+                <label>音色: </label>
+                <select id="metronome-sound">
+                    <option value="click">咔哒声</option>
+                    <option value="woodblock">木鱼</option>
+                    <option value="drum">鼓声</option>
+                    <option value="custom">自定义</option>
+                </select>
+
+                <input type="file" id="custom-sound-upload" accept="audio/*" style="display:none;" />
+                <button class="btn" id="upload-sound-btn">📁 上传音色</button>
+
+                <button class="btn btn-primary" id="start-metronome">▶️ 开始</button>
+                <button class="btn" id="stop-metronome">⏹️ 停止</button>
+            </div>
+
+            <!-- 手打节拍 -->
+            <div class="tap-area">
+                <button id="tap-tempo">🔘 点我打拍子</button>
+                <p>计算 BPM: <strong><span id="calculated-bpm">0</span></strong></p>
+            </div>
+
+            <!-- 节拍视觉反馈 -->
+            <div class="beat-indicator" id="beat-indicator"></div>
+
+            <!-- 看谱 -->
+            <div class="score-view" id="score-view">
+                当前节奏谱（4/4）：<br>
+                | 1 &nbsp; & &nbsp; 2 &nbsp; & &nbsp; 3 &nbsp; & &nbsp; 4 &nbsp; & |
+                <div style="margin-top:10px; font-size:16px;">▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼</div>
+            </div>
+        </div>
+
+        <footer>
+            &copy; 2025 调音节拍器工具 | 支持离线使用
+        </footer>
+    </div>
+
+    <script>
+        // ========================
+        // 全局音频上下文
+        // ========================
+        let audioContext = null;
+        let analyser = null;
+        let micStream = null;
+        let tunerRunning = false;
+        let oscillator = null;
+        let metronomeInterval = null;
+        let customSoundBuffer = null;
+        let clickSoundBuffer = null;
+        let woodblockSoundBuffer = null;
+        let drumSoundBuffer = null;
+        let isUserGesture = false;
+        
+        // 初始化音频上下文（用户手势触发）
+        function initAudio() {
+          if (audioContext) return Promise.resolve();
+          return new Promise((resolve, reject) => {
+            try {
+              audioContext = new (window.AudioContext || window.webkitAudioContext)();
+              analyser = audioContext.createAnalyser();
+              analyser.fftSize = 2048;
+              analyser.smoothingTimeConstant = 0.8;
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          });
+        }
+        
+        // ========================
+        // 调音器：启动麦克风
+        // ========================
+        async function startTuner() {
+          if (!isUserGesture) {
+            document.getElementById('mic-status').innerHTML = '<span class="status-indicator status-inactive"></span>请先点击页面任意位置激活音频';
+            return;
+          }
+          
+          if (!audioContext) await initAudio();
+          if (tunerRunning) return;
+        
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            micStream = stream;
+            const source = audioContext.createMediaStreamSource(stream);
+            source.connect(analyser);
+        
+            tunerRunning = true;
+            document.getElementById('mic-status').innerHTML = '<span class="status-indicator status-active"></span>麦克风已启用';
+            runTunerLoop();
+          } catch (err) {
+            document.getElementById('mic-status').innerHTML = '<span class="status-indicator status-inactive"></span>无法访问麦克风，请检查权限';
+            console.error(err);
+          }
+        }
+        
+        function stopTuner() {
+          if (micStream) {
+            micStream.getTracks().forEach(track => track.stop());
+            micStream = null;
+          }
+          tunerRunning = false;
+          document.getElementById('mic-status').innerHTML = '<span class="status-indicator status-inactive"></span>点击表盘获取麦克风权限';
+        }
+        
+        // 实时音高检测主循环
+        function runTunerLoop() {
+          if (!tunerRunning) return;
+        
+          const buffer = new Float32Array(analyser.fftSize);
+          analyser.getFloatTimeDomainData(buffer);
+        
+          const freq = detectPitch(buffer, audioContext.sampleRate);
+          if (freq) {
+            const noteInfo = getNoteNameAndCents(freq);
+            updateTunerDisplay(noteInfo.note, noteInfo.cents, freq);
+          }
+        
+          requestAnimationFrame(runTunerLoop);
+        }
+        
+        // 简单音高检测（自相关算法）
+        function detectPitch(buffer, sampleRate) {
+          let maxOffset = Math.floor(buffer.length / 2);
+          let bestOffset = -1;
+          let bestCorrelation = 0;
+          let rms = 0;
+        
+          // 计算 RMS（音量）
+          for (let i = 0; i < buffer.length; i++) {
+            rms += buffer[i] * buffer[i];
+          }
+          rms = Math.sqrt(rms / buffer.length);
+          if (rms < 0.01) return -1; // 静音
+        
+          // 自相关
+          for (let offset = 20; offset < maxOffset; offset++) {
+            let correlation = 0;
+            for (let i = 0; i < buffer.length - offset; i++) {
+              correlation += Math.abs(buffer[i] - buffer[i + offset]);
+            }
+            correlation = 1.0 / (correlation / (buffer.length - offset));
+            if (correlation > bestCorrelation) {
+              bestCorrelation = correlation;
+              bestOffset = offset;
+            }
+          }
+        
+          if (bestOffset === -1 || bestCorrelation < 0.01) return null;
+        
+          return sampleRate / bestOffset;
+        }
+        
+        // 音名 + 偏移（升降音）计算
+        function getNoteNameAndCents(freq) {
+          const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+          const A4 = parseFloat(document.getElementById('standard-pitch').value); // 440 or 442
+          const a4Index = 69; // MIDI number of A4
+        
+          const noteNumber = 12 * (Math.log(freq / A4) / Math.log(2)) + a4Index;
+          const rounded = Math.round(noteNumber);
+          const cents = Math.round((noteNumber - rounded) * 100);
+        
+          const note = noteNames[rounded % 12] + Math.floor((rounded + 9) / 12);
+          return { note, cents, freq };
+        }
+        
+        // 更新调音器 UI
+        function updateTunerDisplay(note, cents, freq) {
+          document.getElementById('note-display').textContent = note;
+          document.getElementById('frequency').textContent = `频率: ${freq.toFixed(2)} Hz`;
+        
+          const deviation = cents; // -100 ~ +100
+          const needle = document.getElementById('tuner-needle');
+          if (needle) {
+            const position = Math.max(-100, Math.min(100, deviation * 1.8));
+            needle.style.transform = `translateX(${position}px)`;
+            needle.style.backgroundColor = Math.abs(deviation) < 5 ? '#2ecc71' : '#e74c3c';
+          }
+        }
+        
+        // ========================
+        // 播放标准音（正弦波）
+        // ========================
+        function playReferenceTone() {
+          if (!isUserGesture) return;
+          if (!audioContext) initAudio();
+          stopReferenceTone();
+        
+          const A4 = parseFloat(document.getElementById('standard-pitch').value);
+          oscillator = audioContext.createOscillator();
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(A4, audioContext.currentTime);
+          oscillator.connect(audioContext.destination);
+          oscillator.start();
+          setTimeout(stopReferenceTone, 1000); // 播放1秒
+        }
+        
+        function stopReferenceTone() {
+          if (oscillator) {
+            oscillator.stop();
+            oscillator = null;
+          }
+        }
+        
+        // ========================
+        // 节拍器：Web Audio 精确播放
+        // ========================
+        // 创建内置音色
+        function createClickSoundBuffer() {
+          const sampleRate = audioContext.sampleRate;
+          const duration = 0.05; // 50ms
+          const numFrames = sampleRate * duration;
+          const buffer = audioContext.createBuffer(1, numFrames, sampleRate);
+          const data = buffer.getChannelData(0);
+          
+          // 生成咔哒声
+          for (let i = 0; i < numFrames; i++) {
+            const t = i / sampleRate;
+            // 混合正弦波和白噪声
+            const sine = Math.sin(2 * Math.PI * 880 * t) * Math.exp(-t * 20);
+            const noise = (Math.random() * 2 - 1) * Math.exp(-t * 30);
+            data[i] = (sine + noise * 0.3) * 0.5;
+          }
+          
+          return buffer;
+        }
+        
+        function createWoodblockSoundBuffer() {
+          const sampleRate = audioContext.sampleRate;
+          const duration = 0.1; // 100ms
+          const numFrames = sampleRate * duration;
+          const buffer = audioContext.createBuffer(1, numFrames, sampleRate);
+          const data = buffer.getChannelData(0);
+          
+          // 生成木鱼声
+          for (let i = 0; i < numFrames; i++) {
+            const t = i / sampleRate;
+            const frequency = 400 + 200 * Math.exp(-t * 30);
+            const envelope = Math.exp(-t * 20);
+            data[i] = Math.sin(2 * Math.PI * frequency * t) * envelope;
+          }
+          
+          return buffer;
+        }
+        
+        function createDrumSoundBuffer() {
+          const sampleRate = audioContext.sampleRate;
+          const duration = 0.3; // 300ms
+          const numFrames = sampleRate * duration;
+          const buffer = audioContext.createBuffer(1, numFrames, sampleRate);
+          const data = buffer.getChannelData(0);
+          
+          // 生成鼓声
+          for (let i = 0; i < numFrames; i++) {
+            const t = i / sampleRate;
+            // 低频正弦波 + 噪声
+            const sine = Math.sin(2 * Math.PI * 80 * t) * Math.exp(-t * 10);
+            const noise = (Math.random() * 2 - 1) * Math.exp(-t * 30);
+            data[i] = (sine * 0.7 + noise * 0.3) * 0.5;
+          }
+          
+          return buffer;
+        }
+        
+        // 播放节拍音
+        async function playBeat(isStrongBeat = false) {
+          if (!isUserGesture) return;
+          if (!audioContext) await initAudio();
+        
+          const source = audioContext.createBufferSource();
+          const selected = document.getElementById('metronome-sound').value;
+        
+          // 根据选择加载音色
+          if (selected === 'custom' && customSoundBuffer) {
+            source.buffer = customSoundBuffer;
+          } else {
+            // 按需创建音色
+            switch(selected) {
+              case 'click':
+                if (!clickSoundBuffer) {
+                  clickSoundBuffer = createClickSoundBuffer();
+                }
+                source.buffer = clickSoundBuffer;
+                break;
+              case 'woodblock':
+                if (!woodblockSoundBuffer) {
+                  woodblockSoundBuffer = createWoodblockSoundBuffer();
+                }
+                source.buffer = woodblockSoundBuffer;
+                break;
+              case 'drum':
+                if (!drumSoundBuffer) {
+                  drumSoundBuffer = createDrumSoundBuffer();
+                }
+                source.buffer = drumSoundBuffer;
+                break;
+              default:
+                if (!clickSoundBuffer) {
+                  clickSoundBuffer = createClickSoundBuffer();
+                }
+                source.buffer = clickSoundBuffer;
+            }
+          }
+        
+          // 强拍音量更大
+          const gainNode = audioContext.createGain();
+          gainNode.gain.value = isStrongBeat ? 1.0 : 0.7;
+          source.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          source.start();
+          
+          // 视觉反馈
+          const beatIndicator = document.getElementById('beat-indicator');
+          beatIndicator.classList.add('beat-active');
+          setTimeout(() => {
+            beatIndicator.classList.remove('beat-active');
+          }, 100);
+        }
+        
+        // 启动节拍器
+        let beatCount = 0;
+        function startMetronome() {
+          if (!isUserGesture) {
+            alert("请先点击页面任意位置激活音频");
+            return;
+          }
+          
+          if (!audioContext) initAudio();
+          stopMetronome();
+          
+          const bpm = parseInt(document.getElementById('bpm-slider').value);
+          const timeSignature = document.getElementById('time-signature').value;
+          const beatsPerMeasure = parseInt(timeSignature.split('/')[0]);
+          
+          const interval = 60000 / bpm;
+          beatCount = 0;
+          
+          playBeat(true); // 第一拍（强拍）
+          beatCount++;
+          
+          metronomeInterval = setInterval(() => {
+            const isStrongBeat = (beatCount % beatsPerMeasure === 0);
+            playBeat(isStrongBeat);
+            beatCount++;
+          }, interval);
+        }
+        
+        function stopMetronome() {
+          if (metronomeInterval) {
+            clearInterval(metronomeInterval);
+            metronomeInterval = null;
+          }
+        }
+        
+        // 上传自定义音色
+        document.getElementById('custom-sound-upload').addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+        
+          if (!audioContext) await initAudio();
+          const arrayBuffer = await file.arrayBuffer();
+          customSoundBuffer = await audioContext.decodeAudioData(arrayBuffer);
+          alert("✅ 自定义音色已加载！");
+        });
+        
+        // ========================
+        // 手打节拍 BPM 计算
+        // ========================
+        let tapHistory = [];
+        document.getElementById('tap-tempo').addEventListener('click', function () {
+          const now = performance.now();
+          tapHistory.push(now);
+          if (tapHistory.length > 5) tapHistory.shift();
+        
+          if (tapHistory.length >= 2) {
+            const intervals = [];
+            for (let i = 1; i < tapHistory.length; i++) {
+              intervals.push(tapHistory[i] - tapHistory[i - 1]);
+            }
+            const avg = intervals.reduce((a, b) => a + b) / intervals.length;
+            const bpm = Math.round(60000 / avg);
+            document.getElementById('calculated-bpm').textContent = bpm;
+            
+            // 自动更新滑块
+            document.getElementById('bpm-slider').value = bpm;
+            document.getElementById('bpm-value').textContent = bpm;
+          }
+        });
+        
+        // ========================
+        // UI 初始化与事件绑定
+        // ========================
+        window.addEventListener('load', () => {
+          // 绑定选项卡切换
+          document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+              // 移除所有活动状态
+              document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+              document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+              
+              // 添加当前活动状态
+              tab.classList.add('active');
+              document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+          });
+          
+          // 绑定调音器表盘点击事件
+          document.getElementById('note-display').addEventListener('click', () => {
+            if (!tunerRunning) {
+              startTuner();
+            }
+          });
+          
+          // 绑定麦克风状态点击事件
+          document.getElementById('mic-status').addEventListener('click', () => {
+            if (!tunerRunning) {
+              startTuner();
+            }
+          });
+        
+          // 绑定节拍器按钮
+          document.getElementById('start-metronome').addEventListener('click', () => {
+            startMetronome();
+          });
+        
+          document.getElementById('stop-metronome').addEventListener('click', () => {
+            stopMetronome();
+          });
+        
+          // 绑定 BPM 滑块同步
+          const bpmSlider = document.getElementById('bpm-slider');
+          const bpmValue = document.getElementById('bpm-value');
+          bpmSlider.addEventListener('input', () => {
+            bpmValue.textContent = bpmSlider.value;
+          });
+        
+          // 绑定上传按钮
+          document.getElementById('upload-sound-btn').addEventListener('click', () => {
+            document.getElementById('custom-sound-upload').click();
+          });
+        
+          // 初始化时同步 BPM 显示
+          bpmValue.textContent = bpmSlider.value;
+          
+          // 添加默认字符串
+          addStringRow('E', 329.63);
+          addStringRow('A', 220.00);
+          addStringRow('D', 146.83);
+          addStringRow('G', 98.00);
+          addStringRow('B', 123.47);
+          addStringRow('E', 82.41);
+          
+          // 用户手势检测
+          document.body.addEventListener('click', function initUserGesture() {
+            isUserGesture = true;
+            document.body.removeEventListener('click', initUserGesture);
+          }, { once: true });
+        });
+        
+        // 添加自定义调音行
+        function addStringRow(note, frequency) {
+          const container = document.getElementById('strings');
+          const row = document.createElement('div');
+          row.className = 'string-row';
+          row.innerHTML = `
+            <input type="text" value="${note}" placeholder="音符">
+            <input type="number" value="${frequency.toFixed(2)}" step="0.01" placeholder="频率">
+            <button class="remove-string">删除</button>
+          `;
+          container.appendChild(row);
+          
+          // 绑定删除按钮
+          row.querySelector('.remove-string').addEventListener('click', () => {
+            container.removeChild(row);
+          });
+        }
+        
+        // 添加字符串按钮
+        document.getElementById('add-string').addEventListener('click', () => {
+          addStringRow('A', 440.00);
+        });
+        
+        // 分享调音按钮
+        document.getElementById('share-tuning').addEventListener('click', () => {
+          const strings = document.querySelectorAll('.string-row');
+          const tuning = [];
+          
+          strings.forEach(row => {
+            const note = row.querySelector('input[type="text"]').value;
+            const freq = row.querySelector('input[type="number"]').value;
+            tuning.push({ note, freq });
+          });
+          
+          const shareLink = document.getElementById('share-link');
+          shareLink.textContent = JSON.stringify(tuning);
+          shareLink.style.display = 'block';
+        });
+    </script>
+</body>
+
+</html>
